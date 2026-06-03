@@ -17,30 +17,26 @@ public class GrapplingGun : MonoBehaviour
     [Header("Shooting Setup")]
     public GameObject projectilePrefab;
     public float shootForce = 40f;
+    public int maxMagSize = 5;
+    private int currentMagSize;
 
     [Header("Laser Setup")]
     public LineRenderer laserLr;
     public float laserRange = 200f;
     public float laserForce = 500f;
-    public float laserForceStep = 100f; // NEU: Um wie viel die Kraft pro Tastendruck steigt/fällt
-
-    [Header("UI Setup")]
-    public TMP_Text laserStrengthText; // NEU: Hier verlinken wir das Textfeld
+    public float laserForceStep = 10f; // NEU: Um wie viel die Kraft pro Tastendruck steigt/fällt
 
     void Awake()
     {
+
         lr = GetComponent<LineRenderer>();
 
         if (laserLr != null)
         {
             laserLr.positionCount = 0;
         }
-    }
 
-    // NEU: Start-Methode, um den Text direkt beim Spielstart einmal richtig anzuzeigen
-    void Start()
-    {
-        UpdateLaserText();
+        currentMagSize = maxMagSize;
     }
 
     void Update()
@@ -58,7 +54,17 @@ public class GrapplingGun : MonoBehaviour
         // Rechtsklick: Projektil abfeuern
         if (Input.GetMouseButtonDown(1))
         {
-            Shoot();
+            currentMagSize -= 1;
+            if (currentMagSize > 0)
+            {
+                Shoot();
+            }
+        }
+
+        //R-Taste: Lädt das Magazin nach
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Reload(currentMagSize);
         }
 
         // F-Taste HALTEN: Laser kontinuierlich updaten und abfeuern
@@ -78,7 +84,6 @@ public class GrapplingGun : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown(KeyCode.Plus))
         {
             laserForce += laserForceStep;
-            UpdateLaserText();
         }
 
         if (Input.GetKeyDown(KeyCode.KeypadMinus) || Input.GetKeyDown(KeyCode.Minus))
@@ -89,7 +94,6 @@ public class GrapplingGun : MonoBehaviour
             {
                 laserForce = 0f;
             }
-            UpdateLaserText();
         }
 
         // Objekt (oder dich selbst) mit dem Mausrad heranziehen
@@ -101,19 +105,6 @@ public class GrapplingGun : MonoBehaviour
                 joint.maxDistance -= scroll * 15f;
                 if (joint.maxDistance < 1f) joint.maxDistance = 1f;
             }
-        }
-    }
-
-    // NEU: Diese Funktion aktualisiert das Display auf der Waffe
-    void UpdateLaserText()
-    {
-        if (laserStrengthText != null)
-        {
-            laserStrengthText.text = "PWR: " + laserForce;
-        }
-        else
-        {
-            Debug.LogWarning("Du hast das Textfeld noch nicht im Inspector zugewiesen!");
         }
     }
 
@@ -178,6 +169,11 @@ public class GrapplingGun : MonoBehaviour
         }
 
         Destroy(bullet, 5f);
+    }
+
+    void Reload(int magSize)
+    {
+        currentMagSize = maxMagSize;
     }
 
     void UpdateLaser()
