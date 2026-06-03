@@ -1,9 +1,8 @@
 using UnityEngine;
-using TMPro; // NEU: Wir brauchen diesen Namespace für TextMeshPro!
+using TMPro;
 
 public class GrapplingGun : MonoBehaviour
 {
-
     private LineRenderer lr;
     private Vector3 grapplePoint;
     public LayerMask whatIsGrappleable;
@@ -16,19 +15,31 @@ public class GrapplingGun : MonoBehaviour
 
     [Header("Shooting Setup")]
     public GameObject projectilePrefab;
+    public GameObject alternateProjectilePrefab;
+    private GameObject currentProjectile;
     public float shootForce = 40f;
     public int maxMagSize = 5;
     private int currentMagSize;
+    public TMP_Text magazineText;
 
     [Header("Laser Setup")]
     public LineRenderer laserLr;
     public float laserRange = 200f;
     public float laserForce = 500f;
-    public float laserForceStep = 10f; // NEU: Um wie viel die Kraft pro Tastendruck steigt/fällt
+    public float laserForceStep = 10f;
+    public float maxLaserTime = 3000f;
+    public float currentLaserTime;
+    public LaserBar laserBar;
+
+    // NEU: Hit Effekt Variablen
+    public GameObject laserHitEffectPrefab;
+    private GameObject activeLaserHitEffect; // Das ist unser recycelter Effekt
+
+    public float laserDrainRate = 1000f;
+    public float laserRechargeRate = 500f;
 
     void Awake()
     {
-
         lr = GetComponent<LineRenderer>();
 
         if (laserLr != null)
@@ -37,6 +48,16 @@ public class GrapplingGun : MonoBehaviour
         }
 
         currentMagSize = maxMagSize;
+        currentLaserTime = maxLaserTime;
+
+        if (laserBar != null)
+        {
+            laserBar.SetMaxLaserNRG(currentLaserTime);
+        }
+
+        currentProjectile = projectilePrefab;
+
+        UpdateMagText();
     }
 
     void Update()
@@ -54,33 +75,40 @@ public class GrapplingGun : MonoBehaviour
         // Rechtsklick: Projektil abfeuern
         if (Input.GetMouseButtonDown(1))
         {
-            currentMagSize -= 1;
             if (currentMagSize > 0)
             {
-                Shoot();
+                currentMagSize -= 1;
+                Shoot(currentProjectile);
             }
+            UpdateMagText();
+        }
+
+        //1-Taste für Projektil 1
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            currentProjectile = projectilePrefab;
+        }
+
+        //2-Taste für Projektil 2
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            currentProjectile = alternateProjectilePrefab;
         }
 
         //R-Taste: Lädt das Magazin nach
         if (Input.GetKeyDown(KeyCode.R))
         {
             Reload(currentMagSize);
-        }
-
-        // F-Taste HALTEN: Laser kontinuierlich updaten und abfeuern
-        if (Input.GetKey(KeyCode.F))
-        {
-            UpdateLaser();
+            UpdateMagText();
         }
 
         // F-Taste LOSLASSEN: Laser wieder verstecken
-        if (Input.GetKeyUp(KeyCode.F))
+        if (Input.GetKeyUp(KeyCode.F) || currentLaserTime <= 0)
         {
             DisableLaser();
         }
 
-        // NEU: Laser-Stärke mit + und - regeln
-        // Wir prüfen sowohl das Numpad (KeypadPlus) als auch das normale Plus (Plus)
+        // Laser-Stärke mit + und - regeln
         if (Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown(KeyCode.Plus))
         {
             laserForce += laserForceStep;
@@ -89,7 +117,6 @@ public class GrapplingGun : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.KeypadMinus) || Input.GetKeyDown(KeyCode.Minus))
         {
             laserForce -= laserForceStep;
-            // Wir verhindern, dass die Kraft unter 0 fällt (macht bei einem Push-Laser wenig Sinn)
             if (laserForce < 0f)
             {
                 laserForce = 0f;
@@ -106,11 +133,37 @@ public class GrapplingGun : MonoBehaviour
                 if (joint.maxDistance < 1f) joint.maxDistance = 1f;
             }
         }
+
+        // Passives Aufladen des Lasers
+        if (currentLaserTime < maxLaserTime && !Input.GetKey(KeyCode.F))
+        {
+            currentLaserTime += laserRechargeRate * Time.deltaTime;
+
+            if (currentLaserTime > maxLaserTime)
+            {
+                currentLaserTime = maxLaserTime;
+            }
+
+            if (laserBar != null) laserBar.SetLaserNRG(currentLaserTime);
+        }
     }
 
     void LateUpdate()
     {
         DrawRope();
+
+        if (Input.GetKey(KeyCode.F) && currentLaserTime > 0)
+        {
+            UpdateLaser();
+        }
+    }
+
+    void UpdateMagText()
+    {
+        if (magazineText != null)
+        {
+            magazineText.text = currentMagSize + "/" + maxMagSize;
+        }
     }
 
     void StartGrapple()
@@ -156,11 +209,11 @@ public class GrapplingGun : MonoBehaviour
         grabbedTransform = null;
     }
 
-    void Shoot()
+    void Shoot(GameObject projectile)
     {
         if (projectilePrefab == null) return;
 
-        GameObject bullet = Instantiate(projectilePrefab, gunTip.position, camera.rotation);
+        GameObject bullet = Instantiate(projectile, gunTip.position, camera.rotation);
         Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
         if (bulletRb != null)
@@ -192,11 +245,42 @@ public class GrapplingGun : MonoBehaviour
             {
                 hit.rigidbody.AddForce(camera.forward * laserForce, ForceMode.Force);
             }
+
+            // NEU: Hit Effekt positionieren und aktivieren
+            if (laserHitEffectPrefab != null)
+            {
+                // Falls wir noch keinen Effekt erschaffen haben, tun wir das jetzt
+                if (activeLaserHitEffect == null)
+                {
+                    activeLaserHitEffect = Instantiate(laserHitEffectPrefab);
+                }
+
+                activeLaserHitEffect.SetActive(true); // Einschalten
+                activeLaserHitEffect.transform.position = hit.point; // Genau an die Trefferstelle setzen
+
+                // Rotiert den Effekt so, dass Funken von der Wand WEC fliegen (hit.normal)
+                activeLaserHitEffect.transform.rotation = Quaternion.LookRotation(hit.normal);
+            }
         }
         else
         {
             laserLr.SetPosition(1, camera.position + camera.forward * laserRange);
+
+            // NEU: Wir schießen ins Nichts -> Effekt ausschalten
+            if (activeLaserHitEffect != null)
+            {
+                activeLaserHitEffect.SetActive(false);
+            }
         }
+
+        currentLaserTime -= laserDrainRate * Time.deltaTime;
+
+        if (currentLaserTime < 0)
+        {
+            currentLaserTime = 0;
+        }
+
+        if (laserBar != null) laserBar.SetLaserNRG(currentLaserTime);
     }
 
     void DisableLaser()
@@ -204,6 +288,12 @@ public class GrapplingGun : MonoBehaviour
         if (laserLr != null)
         {
             laserLr.positionCount = 0;
+        }
+
+        // NEU: Laser ist aus -> Effekt ausschalten
+        if (activeLaserHitEffect != null)
+        {
+            activeLaserHitEffect.SetActive(false);
         }
     }
 
