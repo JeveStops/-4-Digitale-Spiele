@@ -6,7 +6,7 @@ public class GrapplingGun : MonoBehaviour
     private LineRenderer lr;
     private Vector3 grapplePoint;
     public LayerMask whatIsGrappleable;
-    public Transform gunTip, camera, player;
+    public Transform gunTip, playerCamera, player;
     private float maxDistance = 100f;
     private SpringJoint joint;
 
@@ -83,19 +83,19 @@ public class GrapplingGun : MonoBehaviour
             UpdateMagText();
         }
 
-        //1-Taste für Projektil 1
+        //1-Taste fï¿½r Projektil 1
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             currentProjectile = projectilePrefab;
         }
 
-        //2-Taste für Projektil 2
+        //2-Taste fï¿½r Projektil 2
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             currentProjectile = alternateProjectilePrefab;
         }
 
-        //R-Taste: Lädt das Magazin nach
+        //R-Taste: Lï¿½dt das Magazin nach
         if (Input.GetKeyDown(KeyCode.R))
         {
             Reload(currentMagSize);
@@ -108,7 +108,7 @@ public class GrapplingGun : MonoBehaviour
             DisableLaser();
         }
 
-        // Laser-Stärke mit + und - regeln
+        // Laser-Stï¿½rke mit + und - regeln
         if (Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown(KeyCode.Plus))
         {
             laserForce += laserForceStep;
@@ -169,7 +169,7 @@ public class GrapplingGun : MonoBehaviour
     void StartGrapple()
     {
         RaycastHit hit;
-        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
+        if (Physics.Raycast(base.GetComponent<Camera>().position, base.GetComponent<Camera>().forward, out hit, maxDistance, whatIsGrappleable))
         {
             grapplePoint = hit.point;
             joint = player.gameObject.AddComponent<SpringJoint>();
@@ -213,12 +213,12 @@ public class GrapplingGun : MonoBehaviour
     {
         if (projectilePrefab == null) return;
 
-        GameObject bullet = Instantiate(projectile, gunTip.position, camera.rotation);
+        GameObject bullet = Instantiate(projectile, gunTip.position, base.GetComponent<Camera>().rotation);
         Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
         if (bulletRb != null)
         {
-            bulletRb.AddForce(camera.forward * shootForce, ForceMode.Impulse);
+            bulletRb.AddForce(base.GetComponent<Camera>().forward * shootForce, ForceMode.Impulse);
         }
 
         Destroy(bullet, 5f);
@@ -237,13 +237,13 @@ public class GrapplingGun : MonoBehaviour
         laserLr.SetPosition(0, gunTip.position);
 
         RaycastHit hit;
-        if (Physics.Raycast(camera.position, camera.forward, out hit, laserRange))
+        if (Physics.Raycast(base.GetComponent<Camera>().position, base.GetComponent<Camera>().forward, out hit, laserRange))
         {
             laserLr.SetPosition(1, hit.point);
 
             if (hit.rigidbody != null)
             {
-                hit.rigidbody.AddForce(camera.forward * laserForce, ForceMode.Force);
+                hit.rigidbody.AddForce(base.GetComponent<Camera>().forward * laserForce, ForceMode.Force);
             }
 
             // NEU: Hit Effekt positionieren und aktivieren
@@ -264,9 +264,9 @@ public class GrapplingGun : MonoBehaviour
         }
         else
         {
-            laserLr.SetPosition(1, camera.position + camera.forward * laserRange);
+            laserLr.SetPosition(1, base.GetComponent<Camera>().position + base.GetComponent<Camera>().forward * laserRange);
 
-            // NEU: Wir schießen ins Nichts -> Effekt ausschalten
+            // NEU: Wir schieï¿½en ins Nichts -> Effekt ausschalten
             if (activeLaserHitEffect != null)
             {
                 activeLaserHitEffect.SetActive(false);
