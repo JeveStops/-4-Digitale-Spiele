@@ -2116,7 +2116,7 @@ MonoBehaviour:
   gunTip: {fileID: 999059274}
   camera: {fileID: 330585546}
   player: {fileID: 941060321}
-  projectilePrefab: {fileID: 8693414739226482649, guid: bd9049e7f5216b542bbd3c4c324aba1b, type: 3}
+  projectilePrefab: {fileID: 3520455119705791340, guid: e289f340894208a4a885f8f8a7da71b4, type: 3}
   alternateProjectilePrefab: {fileID: 8896546047174274387, guid: 76d6444ede495b947a447110c0bcb53a, type: 3}
   shootForce: 100
   maxMagSize: 30
