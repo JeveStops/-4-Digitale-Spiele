@@ -2114,7 +2114,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   gunTip: {fileID: 999059274}
-  camera: {fileID: 330585546}
+  playerCamera: {fileID: 1749588908}
   player: {fileID: 941060321}
   projectilePrefab: {fileID: 8693414739226482649, guid: bd9049e7f5216b542bbd3c4c324aba1b, type: 3}
   alternateProjectilePrefab: {fileID: 8896546047174274387, guid: 76d6444ede495b947a447110c0bcb53a, type: 3}
