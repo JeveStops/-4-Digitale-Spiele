@@ -2072,6 +2072,8 @@ GameObject:
   - component: {fileID: 323972722}
   - component: {fileID: 323972721}
   - component: {fileID: 323972720}
+  - component: {fileID: 323972725}
+  - component: {fileID: 323972726}
   m_Layer: 0
   m_Name: Pistol
   m_TagString: Untagged
@@ -2116,21 +2118,6 @@ MonoBehaviour:
   gunTip: {fileID: 999059274}
   playerCamera: {fileID: 1749588908}
   player: {fileID: 941060321}
-  projectilePrefab: {fileID: 8693414739226482649, guid: bd9049e7f5216b542bbd3c4c324aba1b, type: 3}
-  alternateProjectilePrefab: {fileID: 8896546047174274387, guid: 76d6444ede495b947a447110c0bcb53a, type: 3}
-  shootForce: 100
-  maxMagSize: 30
-  magazineText: {fileID: 372265894}
-  laserLr: {fileID: 2106826052}
-  laserRange: 200
-  laserForce: 20
-  laserForceStep: 100
-  maxLaserTime: 500
-  currentLaserTime: 0
-  laserBar: {fileID: 1903888169}
-  laserHitEffectPrefab: {fileID: 2814622573724956784, guid: d692ea044baf2fb47a44252e2b54ee25, type: 3}
-  laserDrainRate: 70
-  laserRechargeRate: 500
 --- !u!120 &323972721
 LineRenderer:
   serializedVersion: 3
@@ -2319,6 +2306,49 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 323972718}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &323972725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323972718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 647fcb3cd25fd5b4388c356408cde052, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LaserGun
+  gunTip: {fileID: 999059274}
+  playerCamera: {fileID: 1749588908}
+  laserLr: {fileID: 2106826052}
+  laserRange: 200
+  laserForce: 500
+  laserForceStep: 10
+  maxLaserTime: 3000
+  currentLaserTime: 0
+  laserBar: {fileID: 1903888169}
+  laserDrainRate: 1000
+  laserRechargeRate: 500
+  laserHitEffectPrefab: {fileID: 2814622573724956784, guid: d692ea044baf2fb47a44252e2b54ee25, type: 3}
+--- !u!114 &323972726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323972718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c76cee8d4c66344ba6580664ddb6fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectileShooting
+  gunTip: {fileID: 999059274}
+  playerCamera: {fileID: 1749588908}
+  projectilePrefab: {fileID: 8693414739226482649, guid: bd9049e7f5216b542bbd3c4c324aba1b, type: 3}
+  alternateProjectilePrefab: {fileID: 8896546047174274387, guid: 76d6444ede495b947a447110c0bcb53a, type: 3}
+  shootForce: 40
+  maxMagSize: 5
+  magazineText: {fileID: 372265894}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -4055,7 +4085,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 0c3c4fafc410d2f47b773aae8ed3ad90, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

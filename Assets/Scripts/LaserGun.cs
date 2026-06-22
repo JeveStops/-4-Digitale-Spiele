@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class LaserGun : MonoBehaviour
 {
+    public Transform gunTip, playerCamera; // Hier ist deine playerCamera!
+
     [Header("Laser Setup")]
     public LineRenderer laserLr;
     public float laserRange = 200f;
@@ -24,12 +26,13 @@ public class LaserGun : MonoBehaviour
             laserLr.positionCount = 0;
         }
 
+        // FEHLER BEHOBEN: Erst den Wert setzen, dann der UI übergeben!
+        currentLaserTime = maxLaserTime;
+
         if (laserBar != null)
         {
-            laserBar.SetMaxLaserNRG(currentLaserTime);
+            laserBar.SetMaxLaserNRG(maxLaserTime);
         }
-
-        currentLaserTime = maxLaserTime;
     }
 
 
@@ -112,5 +115,18 @@ public class LaserGun : MonoBehaviour
         }
 
         if (laserBar != null) laserBar.SetLaserNRG(currentLaserTime);
+    }
+
+    void DisableLaser()
+    {
+        if (laserLr != null)
+        {
+            laserLr.positionCount = 0;
+        }
+
+        if (activeLaserHitEffect != null)
+        {
+            activeLaserHitEffect.SetActive(false);
+        }
     }
 }
