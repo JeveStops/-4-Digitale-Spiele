@@ -14,6 +14,9 @@ public class ProjectileShooting : MonoBehaviour
     private int currentMagSize;
     public TMP_Text magazineText;
 
+    [Header("Effects")]
+    [SerializeField] private GunMuzzleFlash muzzleFlash;
+
     private void Awake()
     {
         currentMagSize = maxMagSize;
@@ -33,6 +36,7 @@ public class ProjectileShooting : MonoBehaviour
             {
                 currentMagSize -= 1;
                 Shoot(currentProjectile);
+                
             }
             UpdateMagText();
         }
@@ -59,15 +63,18 @@ public class ProjectileShooting : MonoBehaviour
 
     void Shoot(GameObject projectile)
     {
-        if (projectilePrefab == null) return;
+        if (projectile == null) return;
 
         GameObject bullet = Instantiate(projectile, gunTip.position, playerCamera.rotation);
+
         Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
         if (bulletRb != null)
         {
             bulletRb.AddForce(playerCamera.forward * shootForce, ForceMode.Impulse);
         }
+
+        muzzleFlash?.Fire();
 
         Destroy(bullet, 5f);
     }
