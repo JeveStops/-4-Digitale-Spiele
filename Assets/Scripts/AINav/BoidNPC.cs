@@ -7,8 +7,8 @@ public class BoidNPC : MonoBehaviour
     public enum State { Flock, Flee }
     public State currentState = State.Flock;
 
-    // Ziehe hier im Inspector den roten Jäger rein!
-    public Transform hunter;
+    // HINWEIS: Das Feld "public Transform hunter" haben wir entfernt, 
+    // da sich die Boids jetzt automatisch alle Jäger in der Szene suchen!
 
     public float fleeDistance = 8f;      // Ab wann wird geflohen?
     public float neighborRadius = 6f;    // Wie weit wird nach Nachbarn gesucht?
@@ -16,20 +16,33 @@ public class BoidNPC : MonoBehaviour
 
     private NavMeshAgent agent;
     private BoidNPC[] allBoids;
+    private HunterNPC[] allHunters; // NEU: Eine Liste aller Jäger
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        allBoids = FindObjectsByType<BoidNPC>(FindObjectsSortMode.None);
+        allBoids = FindObjectsByType<BoidNPC>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        allHunters = FindObjectsByType<HunterNPC>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
     }
 
     void Update()
     {
-        // 1. Wahrnehmung: Wie weit ist der Jäger weg?
-        float distToHunter = Vector3.Distance(transform.position, hunter.position);
+        // 1. Wahrnehmung: Welcher Jäger von allen ist uns am nächsten?
+        float closestHunterDist = Mathf.Infinity;
+        Transform closestHunter = null;
 
-        // 2. FSM Zustandswechsel
-        if (distToHunter < fleeDistance)
+        foreach (var h in allHunters)
+        {
+            float dist = Vector3.Distance(transform.position, h.transform.position);
+            if (dist < closestHunterDist)
+            {
+                closestHunterDist = dist;
+                closestHunter = h.transform;
+            }
+        }
+
+        // 2. FSM Zustandswechsel (Wir reagieren nur auf den Jäger, der uns am nächsten ist)
+        if (closestHunterDist < fleeDistance)
         {
             currentState = State.Flee; // Jäger ist nah -> Flucht!
         }
@@ -45,10 +58,10 @@ public class BoidNPC : MonoBehaviour
         {
             targetPos = CalculateFlockBehavior();
         }
-        else if (currentState == State.Flee)
+        else if (currentState == State.Flee && closestHunter != null)
         {
-            // Weg vom Jäger rennen...
-            Vector3 fleeDirection = (transform.position - hunter.position).normalized;
+            // Weg vom nächsten Jäger rennen...
+            Vector3 fleeDirection = (transform.position - closestHunter.position).normalized;
             // ...aber trotzdem versuchen, bei der Gruppe zu bleiben
             Vector3 groupCenter = CalculateCohesion();
 
@@ -95,8 +108,15 @@ public class BoidNPC : MonoBehaviour
             return cohesion + separation; // Ziel ist die Mitte + nötiger Abstand
         }
 
-        // Wenn niemand in der Nähe ist, bleib stehen oder geh leicht vorwärts
-        return transform.position;
+        // Wenn niemand in der Nähe ist, rette dich zur globalen Mitte der gesamten Herde!
+        Vector3 globalCenter = Vector3.zero;
+        foreach (var boid in allBoids)
+        {
+            globalCenter += boid.transform.position;
+        }
+        globalCenter /= allBoids.Length;
+
+        return globalCenter;
     }
 
     // Hilfsfunktion: Berechnet nur das Zentrum der Gruppe (für die gemeinsame Flucht)
