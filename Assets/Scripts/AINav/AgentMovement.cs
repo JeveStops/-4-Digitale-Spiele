@@ -1,23 +1,21 @@
 using UnityEngine;
-using UnityEngine.AI; // Wichtig für die Navigation!
+using UnityEngine.AI;
 
 public class AgentMovement : MonoBehaviour
 {
-    // Hier ziehen wir später im Inspector unser Ziel-Objekt rein
-    public Transform target;
+    public Transform target; // Ziel Objekt, was der Agent
 
     private NavMeshAgent agent;
 
     void Start()
     {
-        // Wir holen uns die Agenten-Komponente, die auf derselben Kapsel liegt
+        // Zugriff auf Agent-Komponente holen
         agent = GetComponent<NavMeshAgent>();
     }
 
     void Update()
     {
-        // Wir sagen dem Agenten jeden Frame: "Gehe zur Position des Ziels!"
-        // So läuft er auch weiter, wenn du das Ziel im Play-Modus verschiebst.
+        // Verfolgung wird pro Frame erneuert, sodass auch bei Verschiebung des Objekt der Agent die aktuelleste Position verfolgt
         if (target != null)
         {
             agent.SetDestination(target.position);
