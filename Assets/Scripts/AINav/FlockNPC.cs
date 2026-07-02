@@ -1,54 +1,53 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class BoidNPC : MonoBehaviour
+public class FlockNPC : MonoBehaviour
 {
     // Die FSM-Zustände für die Herde
     public enum State { Flock, Flee }
     public State currentState = State.Flock;
-
-    // HINWEIS: Das Feld "public Transform hunter" haben wir entfernt, 
-    // da sich die Boids jetzt automatisch alle Jäger in der Szene suchen!
 
     public float fleeDistance = 8f;      // Ab wann wird geflohen?
     public float neighborRadius = 6f;    // Wie weit wird nach Nachbarn gesucht?
     public float separationDistance = 2f; // Mindestabstand zueinander
 
     private NavMeshAgent agent;
-    private BoidNPC[] allBoids;
-    private HunterNPC[] allHunters; // NEU: Eine Liste aller Jäger
+    private FlockNPC[] allFlockNPCs; //Speichert alle Herden Mitglieder
+    private HunterNPC[] allHunters; //Speichert alle Jäger Objekte
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        allBoids = FindObjectsByType<BoidNPC>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        allHunters = FindObjectsByType<HunterNPC>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        allFlockNPCs = FindObjectsByType<FlockNPC>(FindObjectsInactive.Exclude);
+        allHunters = FindObjectsByType<HunterNPC>(FindObjectsInactive.Exclude);
     }
 
     void Update()
     {
-        // 1. Wahrnehmung: Welcher Jäger von allen ist uns am nächsten?
+        // 1. Untersuchung: Prüfung, welcher Jäger der Herde am nächsten ist
+
+        // Initialisierung
         float closestHunterDist = Mathf.Infinity;
         Transform closestHunter = null;
 
-        foreach (var h in allHunters)
+        foreach (var hunter in allHunters)
         {
-            float dist = Vector3.Distance(transform.position, h.transform.position);
+            float dist = Vector3.Distance(transform.position, hunter.transform.position); // Distanz zwischen eigener und Jäger Position
             if (dist < closestHunterDist)
             {
                 closestHunterDist = dist;
-                closestHunter = h.transform;
+                closestHunter = hunter.transform;
             }
         }
 
-        // 2. FSM Zustandswechsel (Wir reagieren nur auf den Jäger, der uns am nächsten ist)
+        // 2. FSM Zustandswechsel: Reaktion nur auf den naheliegendsten Jäger
         if (closestHunterDist < fleeDistance)
         {
-            currentState = State.Flee; // Jäger ist nah -> Flucht!
+            currentState = State.Flee; // Ist der Jäger zu nah, Fliehen
         }
         else
         {
-            currentState = State.Flock; // Jäger ist weit weg -> Herde bilden
+            currentState = State.Flock; // Ist der Jäger weit genug weg, Herde bilden
         }
 
         // 3. Verhalten ausführen
@@ -60,9 +59,10 @@ public class BoidNPC : MonoBehaviour
         }
         else if (currentState == State.Flee && closestHunter != null)
         {
-            // Weg vom nächsten Jäger rennen...
+            // Weg vom nächsten Jäger fliehen, ...
             Vector3 fleeDirection = (transform.position - closestHunter.position).normalized;
-            // ...aber trotzdem versuchen, bei der Gruppe zu bleiben
+
+            // ...aber trotzdem versuchen, bei der Herde zu bleiben
             Vector3 groupCenter = CalculateCohesion();
 
             targetPos = transform.position + (fleeDirection * 5f) + (groupCenter - transform.position).normalized * 2f;
@@ -83,21 +83,21 @@ public class BoidNPC : MonoBehaviour
         Vector3 separation = Vector3.zero; // Abstand halten
         int neighbors = 0;
 
-        foreach (var boid in allBoids)
+        foreach (var npc in allFlockNPCs)
         {
-            if (boid == this) continue; // Sich selbst ignorieren
+            if (npc == this) continue; // Sich selbst ignorieren
 
-            float dist = Vector3.Distance(transform.position, boid.transform.position);
+            float dist = Vector3.Distance(transform.position, npc.transform.position);
 
             if (dist < neighborRadius)
             {
-                cohesion += boid.transform.position;
+                cohesion += npc.transform.position;
                 neighbors++;
 
-                // Wenn ein Kollege zu nah ist, baue Abstand auf
+                // Wenn ein anderes Herden Mitglied zu nah ist, baue Abstand auf
                 if (dist < separationDistance)
                 {
-                    separation += (transform.position - boid.transform.position).normalized / dist;
+                    separation += (transform.position - npc.transform.position).normalized / dist;
                 }
             }
         }
@@ -110,11 +110,11 @@ public class BoidNPC : MonoBehaviour
 
         // Wenn niemand in der Nähe ist, rette dich zur globalen Mitte der gesamten Herde!
         Vector3 globalCenter = Vector3.zero;
-        foreach (var boid in allBoids)
+        foreach (var npc in allFlockNPCs)
         {
-            globalCenter += boid.transform.position;
+            globalCenter += npc.transform.position;
         }
-        globalCenter /= allBoids.Length;
+        globalCenter /= allFlockNPCs.Length;
 
         return globalCenter;
     }
@@ -124,12 +124,12 @@ public class BoidNPC : MonoBehaviour
     {
         Vector3 cohesion = Vector3.zero;
         int neighbors = 0;
-        foreach (var boid in allBoids)
+        foreach (var npc in allFlockNPCs)
         {
-            if (boid == this) continue;
-            if (Vector3.Distance(transform.position, boid.transform.position) < neighborRadius)
+            if (npc == this) continue;
+            if (Vector3.Distance(transform.position, npc.transform.position) < neighborRadius)
             {
-                cohesion += boid.transform.position;
+                cohesion += npc.transform.position;
                 neighbors++;
             }
         }

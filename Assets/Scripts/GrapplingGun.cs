@@ -3,10 +3,11 @@ using TMPro;
 
 public class GrapplingGun : MonoBehaviour
 {
+    [Header("GRappleGun Presets")]
     private LineRenderer lr;
     private Vector3 grapplePoint;
     public LayerMask whatIsGrappleable;
-    public Transform gunTip, playerCamera, player; // Hier ist deine playerCamera!
+    public Transform gunTip, playerCamera, player;
     private float maxDistance = 100f;
     private SpringJoint joint;
 
@@ -42,6 +43,7 @@ public class GrapplingGun : MonoBehaviour
         }
     }
 
+    // Late Update, damit die Visualisierung korrekt erst nach allen Berechnungen ausgeführt wird
     void LateUpdate()
     {
         DrawRope();
@@ -50,7 +52,8 @@ public class GrapplingGun : MonoBehaviour
     void StartGrapple()
     {
         RaycastHit hit;
-        // GANZ WICHTIG: Hier nutzen wir jetzt direkt 'playerCamera'
+
+        // Wenn der RayCast etwas treffbares berührt wird eine Spring Joint erzeugt (Eine Feder zwischen Spieler und Objekt letztendlich)
         if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, maxDistance, whatIsGrappleable))
         {
             grapplePoint = hit.point;
@@ -84,6 +87,7 @@ public class GrapplingGun : MonoBehaviour
         }
     }
 
+    // Los Lösung des Joints und resetten aller wichtigen Attribute des Greifhaken-Punktes
     void StopGrapple()
     {
         lr.positionCount = 0;
@@ -93,6 +97,7 @@ public class GrapplingGun : MonoBehaviour
 
     private Vector3 currentGrapplePosition;
 
+    // Visualisierung des Seils
     void DrawRope()
     {
         if (!joint) return;

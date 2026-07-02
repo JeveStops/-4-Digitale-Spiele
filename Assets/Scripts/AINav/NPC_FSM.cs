@@ -3,19 +3,19 @@ using UnityEngine.AI;
 
 public class NPC_FSM : MonoBehaviour
 {
-    // 1. Hier definieren wir unsere drei Zustände
+    // 1. Drei Zustände der FSM
     public enum State { Wander, Seek, Hunt }
 
     // Aktueller Zustand (Standard ist Wander)
     public State currentState = State.Wander;
 
-    // 2. Unsere Ziele für Seek und Hunt
+    // 2. Unsere Ziele für die anderen Zustände Seek und Hunt
     public Transform seekTarget;
     public Transform huntTarget;
 
     // 3. Entfernungen, bei denen der Zustand gewechselt wird
-    public float huntDistance = 5f;  // Wenn Spieler näher als 5m ist -> Hunt
-    public float seekDistance = 15f; // Wenn Item näher als 15m ist -> Seek
+    public float huntDistance = 5f;  // Wenn Spieler näher als 5m ist, Hunt
+    public float seekDistance = 15f; // Wenn Zielobjekt näher als 15m ist, Seek
     public float wanderRadius = 10f; // Wie weit darf er beim Wandern laufen?
 
     private NavMeshAgent agent;
@@ -28,9 +28,9 @@ public class NPC_FSM : MonoBehaviour
 
     void Update()
     {
-        CheckTransitions(); // Prüfe jeden Frame, ob wir wechseln müssen
+        CheckTransitions(); // Prüfe jeden Frame, ob wir den Zustand wechseln müssen
 
-        // 4. Das eigentliche Verhalten je nach Zustand
+        // 4. Verhalten je nach Zustand
         switch (currentState)
         {
             case State.Wander:
@@ -57,12 +57,12 @@ public class NPC_FSM : MonoBehaviour
         float distToHunt = Vector3.Distance(transform.position, huntTarget.position);
         float distToSeek = Vector3.Distance(transform.position, seekTarget.position);
 
-        // Priorität 1: Wenn der Spieler nah ist -> Jagen!
+        // Priorität 1: Wenn der Spieler nah ist, Jagen
         if (distToHunt <= huntDistance)
         {
             currentState = State.Hunt;
         }
-        // Priorität 2: Wenn ein Item in der Nähe ist -> Einsammeln/Suchen!
+        // Priorität 2: Wenn ein Zielobjekt in der Nähe ist, Suchen
         else if (distToSeek <= seekDistance)
         {
             currentState = State.Seek;

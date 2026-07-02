@@ -4,50 +4,50 @@ using UnityEngine.AI;
 public class HunterNPC : MonoBehaviour
 {
     private NavMeshAgent agent;
-    private BoidNPC[] allBoids;
+    private FlockNPC[] allFlockNPCs;
     private HunterNPC[] allHunters;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         // Alle Boids und alle Jäger in der Szene finden
-        allBoids = FindObjectsByType<BoidNPC>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        allHunters = FindObjectsByType<HunterNPC>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        allFlockNPCs = FindObjectsByType<FlockNPC>(FindObjectsInactive.Exclude);
+        allHunters = FindObjectsByType<HunterNPC>(FindObjectsInactive.Exclude);
     }
 
     void Update()
     {
-        // Sicherheitshalber: Wenn es keine Herde gibt, mach nichts.
-        if (allBoids.Length == 0) return;
+        // Wenn es keine Herde gibt, mach nichts.
+        if (allFlockNPCs.Length == 0) return;
 
-        // 1. Mein persönlich nächstgelegenes Ziel finden
-        float myMinDistance = GetDistanceToClosestBoid(transform.position, out Transform myTarget);
+        // 1. Nächstgelegenes Ziel finden
+        float minDistance = GetDistanceToClosestNPC(transform.position, out Transform target);
 
-        if (myTarget == null) return;
+        if (target == null) return;
 
-        // 2. Ist ein anderer Jäger in der Szene noch näher an GENAU DIESEM Ziel dran als ich?
+        // 2. Ist ein anderer Jäger in der Szene noch näher an GENAU DIESEM Ziel dran?
         bool amIClosestToMyTarget = true;
         foreach (var otherHunter in allHunters)
         {
-            if (otherHunter == this) continue; // Mich selbst überspringen
+            if (otherHunter == this) continue; // Sich selbst überspringen
 
-            // Wir prüfen, wie weit der andere Jäger von MEINEM Ziel entfernt ist
-            float distFromOtherToMyTarget = Vector3.Distance(otherHunter.transform.position, myTarget.position);
+            // Wir prüfen, wie weit der andere Jäger vom eigenen Ziel entfernt ist
+            float distFromOtherToMyTarget = Vector3.Distance(otherHunter.transform.position, target.position);
 
-            // Wenn der andere Jäger näher an meinem Ziel ist, überlasse ich es ihm!
-            if (distFromOtherToMyTarget < myMinDistance)
+            // Wenn der andere Jäger näher am Ziel ist, überlasse es dem anderen
+            if (distFromOtherToMyTarget < minDistance)
             {
                 amIClosestToMyTarget = false;
                 break; // Schleife abbrechen, wir müssen nicht weiter suchen
             }
         }
 
-        // 3. Handeln!
+        // 3. Verhalten ausführen
         if (amIClosestToMyTarget)
         {
-            // Niemand ist näher an diesem speziellen Boid als ich, also jage ich es!
+            // Niemand ist näher an diesem speziellen Herden Mitglied als ich, also jage ich es!
             agent.isStopped = false; // NavMeshAgent wieder aktivieren falls er gestoppt war
-            agent.SetDestination(myTarget.position);
+            agent.SetDestination(target.position);
         }
         else
         {
@@ -56,19 +56,19 @@ public class HunterNPC : MonoBehaviour
         }
     }
 
-    // Hilfsfunktion: Berechnet den Abstand zum nächstgelegenen Boid von einer bestimmten Position aus
-    float GetDistanceToClosestBoid(Vector3 originPos, out Transform closestBoid)
+    // Hilfsfunktion: Berechnet den Abstand zum nächstgelegenen Herden Mitglied von einer bestimmten Position aus
+    float GetDistanceToClosestNPC(Vector3 originPos, out Transform closestFlockNPC)
     {
-        closestBoid = null;
+        closestFlockNPC = null;
         float minDistance = Mathf.Infinity;
 
-        foreach (var boid in allBoids)
+        foreach (var npc in allFlockNPCs)
         {
-            float dist = Vector3.Distance(originPos, boid.transform.position);
+            float dist = Vector3.Distance(originPos, npc.transform.position);
             if (dist < minDistance)
             {
                 minDistance = dist;
-                closestBoid = boid.transform;
+                closestFlockNPC = npc.transform;
             }
         }
         return minDistance;

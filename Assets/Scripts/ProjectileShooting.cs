@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ProjectileShooting : MonoBehaviour
 {
-    public Transform gunTip, playerCamera; // Hier ist deine playerCamera!
+    public Transform gunTip, playerCamera;
 
     [Header("Shooting Setup")]
     public GameObject projectilePrefab;
@@ -26,7 +26,6 @@ public class ProjectileShooting : MonoBehaviour
         UpdateMagText();
     }
 
-    // Update is called once per frame
     void Update()
     {
         // Rechtsklick: Projektil abfeuern

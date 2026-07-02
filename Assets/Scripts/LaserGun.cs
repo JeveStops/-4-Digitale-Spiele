@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LaserGun : MonoBehaviour
 {
-    public Transform gunTip, playerCamera; // Hier ist deine playerCamera!
+    public Transform gunTip, playerCamera;
 
     [Header("Laser Setup")]
     public LineRenderer laserLr;
@@ -19,6 +19,7 @@ public class LaserGun : MonoBehaviour
     public GameObject laserHitEffectPrefab;
     private GameObject activeLaserHitEffect;
 
+    // Initialisierung
     private void Awake()
     {
         if (laserLr != null)
@@ -26,7 +27,7 @@ public class LaserGun : MonoBehaviour
             laserLr.positionCount = 0;
         }
 
-        // FEHLER BEHOBEN: Erst den Wert setzen, dann der UI übergeben!
+        
         currentLaserTime = maxLaserTime;
 
         if (laserBar != null)
@@ -36,7 +37,6 @@ public class LaserGun : MonoBehaviour
     }
 
 
-    // Update is called once per frame
     void Update()
     {
         // F-Taste LOSLASSEN: Laser wieder verstecken
@@ -61,12 +61,14 @@ public class LaserGun : MonoBehaviour
 
     private void LateUpdate()
     {
+        // F-Taste GEDRÜCKT HALTEN: Laser abfeuern
         if (Input.GetKey(KeyCode.F) && currentLaserTime > 0)
         {
             FireLaser();
         }
     }
 
+    // Abgefeurter Laser  stoßt Objekte mit Rigidbodies weg
     void FireLaser()
     {
         if (laserLr == null) return;
@@ -75,23 +77,27 @@ public class LaserGun : MonoBehaviour
         laserLr.SetPosition(0, gunTip.position);
 
         RaycastHit hit;
-        // Und natürlich auch hier beim Laser: 'playerCamera'
+        
+        // Verhalten, wenn der Laser einen Rigibody trifft oder nichts
+
+        // 1. Laser trifft Rigidbody
         if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, laserRange))
         {
-            laserLr.SetPosition(1, hit.point);
+            laserLr.SetPosition(1, hit.point); // Konfigurierung der Laser-Visualisierung
 
             if (hit.rigidbody != null)
             {
-                hit.rigidbody.AddForce(playerCamera.forward * laserForce, ForceMode.Force);
+                hit.rigidbody.AddForce(playerCamera.forward * laserForce, ForceMode.Force); // Stoß-Kraft auf den getroffeen Rigidbody anwenden
             }
 
             if (laserHitEffectPrefab != null)
             {
                 if (activeLaserHitEffect == null)
                 {
-                    activeLaserHitEffect = Instantiate(laserHitEffectPrefab);
+                    activeLaserHitEffect = Instantiate(laserHitEffectPrefab); // Laser-Effekt erstellen falls vorhanden
                 }
 
+                // Laser-Effekt aktivieren an der Einschalgsstelle des Lasers
                 activeLaserHitEffect.SetActive(true);
                 activeLaserHitEffect.transform.position = hit.point;
                 activeLaserHitEffect.transform.rotation = Quaternion.LookRotation(hit.normal);
@@ -107,14 +113,14 @@ public class LaserGun : MonoBehaviour
             }
         }
 
-        currentLaserTime -= laserDrainRate * Time.deltaTime;
+        currentLaserTime -= laserDrainRate * Time.deltaTime; // Reduktion der Laser-Energie je länger der Laser abgefeurt wird
 
         if (currentLaserTime < 0)
         {
             currentLaserTime = 0;
         }
 
-        if (laserBar != null) laserBar.SetLaserNRG(currentLaserTime);
+        if (laserBar != null) laserBar.SetLaserNRG(currentLaserTime); // Verknüpfung mit der UI
     }
 
     void DisableLaser()
