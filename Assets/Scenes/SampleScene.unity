@@ -10700,9 +10700,13 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5956697566169710823, guid: 194b5aef550d0e143b183b66f8cb5414, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5956697566169710823, guid: 194b5aef550d0e143b183b66f8cb5414, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: d606c2ccc54653d4295c0c70b77d2590, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 6452997730073901828, guid: 194b5aef550d0e143b183b66f8cb5414, type: 3}
       propertyPath: m_LocalPosition.y
       value: -0.2986
