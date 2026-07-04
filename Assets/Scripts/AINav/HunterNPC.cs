@@ -10,7 +10,6 @@ public class HunterNPC : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        // Alle Boids und alle Jäger in der Szene finden
         allFlockNPCs = FindObjectsByType<FlockNPC>(FindObjectsInactive.Exclude);
         allHunters = FindObjectsByType<HunterNPC>(FindObjectsInactive.Exclude);
     }
