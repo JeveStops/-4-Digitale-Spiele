@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4521572706906975906}
   - component: {fileID: 5190754881993063748}
   m_Layer: 0
-  m_Name: FootTarget_BL
+  m_Name: Foot_BL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,9 +26,9 @@ Transform:
   m_GameObject: {fileID: 297123964125167369}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.8172858, y: -1.3163899, z: -2.7483797}
-  m_LocalScale: {x: 2.62, y: 2.62, z: 2.62}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: -3, y: -1.275, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6167185169012907997}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -45,15 +45,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpiderLeg
   spiderRoot: {fileID: 5400181334980685304}
-  footTarget: {fileID: 4521572706906975906}
-  localOffset: {x: 0, y: 0, z: 0}
-  stepDistance: 0.5
+  footTarget: {fileID: 0}
+  localOffset: {x: -1, y: 0, z: -1}
+  stepDistance: 1
   stepHeight: 0.25
   stepDuration: 0.15
-  raycastHeight: 1.5
+  raycastHeight: 4
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
 --- !u!1 &609504343179947410
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,8 +308,8 @@ Transform:
   m_GameObject: {fileID: 1017381480385693106}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: -0.5}
-  m_LocalScale: {x: 0.10000001, y: 0.1, z: 0.9}
+  m_LocalPosition: {x: 0, y: -0, z: -0.58}
+  m_LocalScale: {x: 0.10000001, y: 0.1, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8836011766806700976}
@@ -416,13 +416,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1099745425957567046}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.258819, y: 0, z: 0, w: 0.9659259}
-  m_LocalPosition: {x: 0, y: -0.0059, z: -0.9488}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.05, z: -1.182}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3768516289080810373}
-  m_LocalEulerAnglesHint: {x: -30, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1116306843721047658
 GameObject:
   m_ObjectHideFlags: 0
@@ -522,7 +522,7 @@ MonoBehaviour:
     m_Root: {fileID: 3174690456486082100}
     m_Mid: {fileID: 2452948441911487496}
     m_Tip: {fileID: 2962477235998382464}
-    m_Target: {fileID: 6452997730073901828}
+    m_Target: {fileID: 0}
     m_Hint: {fileID: 0}
     m_TargetPositionWeight: 1
     m_TargetRotationWeight: 1
@@ -557,8 +557,8 @@ Transform:
   m_GameObject: {fileID: 1748357010779017989}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: -0.5}
-  m_LocalScale: {x: 0.10000001, y: 0.1, z: 0.9}
+  m_LocalPosition: {x: 0, y: -0, z: -0.58}
+  m_LocalScale: {x: 0.10000001, y: 0.1, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2452948441911487496}
@@ -802,7 +802,7 @@ Animator:
   m_GameObject: {fileID: 2296985079285101168}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d606c2ccc54653d4295c0c70b77d2590, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -843,10 +843,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpiderBrain
   movement: {fileID: 6314854839455709526}
-  minWalkTime: 2
-  maxWalkTime: 5
+  legController: {fileID: 6502717250077802883}
+  bodyAligner: {fileID: 0}
+  animator: {fileID: 5956697566169710823}
+  player: {fileID: 0}
+  minWalkTime: 5
+  maxWalkTime: 15
   minIdleTime: 1
   maxIdleTime: 3
+  viewDistance: 10
+  viewAngle: 90
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  freezeDistance: 2
+  currentState: 2
 --- !u!114 &6314854839455709526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -859,8 +870,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3397c32c9fc8440ebccca8844a7d190, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpiderMovement
-  moveSpeed: 2
-  turnSpeed: 5
+  moveSpeed: 3
+  turnSpeed: 0.5
+  forwardAngleLimit: 20
 --- !u!114 &6502717250077802883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1033,7 +1045,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6167185169012907997}
   m_Layer: 0
-  m_Name: FootTargets
+  m_Name: Feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1083,7 +1095,7 @@ Transform:
   m_GameObject: {fileID: 2868423554848169521}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.0059, z: -0.9488}
+  m_LocalPosition: {x: -0, y: -0.05, z: -1.182}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1151,8 +1163,8 @@ Transform:
   m_GameObject: {fileID: 3426711351810643579}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: -0.5}
-  m_LocalScale: {x: 0.10000001, y: 0.1, z: 0.9}
+  m_LocalPosition: {x: 0, y: -0, z: -0.58}
+  m_LocalScale: {x: 0.10000001, y: 0.1, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8192525501640796980}
@@ -1244,6 +1256,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8776999189875999904}
+  - component: {fileID: 4201312934488185513}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -1271,6 +1284,25 @@ Transform:
   - {fileID: 8192871784901509548}
   m_Father: {fileID: 5400181334980685304}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4201312934488185513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3915966983072258382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b909bb0c10ce1ee45953b2fcd44632d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpiderBodySurfaceAligner
+  frontLeftFoot: {fileID: 0}
+  frontRightFoot: {fileID: 0}
+  backLeftFoot: {fileID: 0}
+  backRightFoot: {fileID: 0}
+  bodyHeight: 1
+  heightSmooth: 6
+  rotationSmooth: 6
 --- !u!1 &3967024375553164487
 GameObject:
   m_ObjectHideFlags: 0
@@ -1394,7 +1426,7 @@ GameObject:
   - component: {fileID: 6741160639998273440}
   - component: {fileID: 2738394999452485993}
   m_Layer: 0
-  m_Name: FootTarget_FL
+  m_Name: Foot_FL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1409,9 +1441,9 @@ Transform:
   m_GameObject: {fileID: 4676949063048228189}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.8172858, y: -1.2831159, z: 2.8094256}
-  m_LocalScale: {x: 2.62, y: 2.62, z: 2.62}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: -3, y: -1.275, z: 3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6167185169012907997}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1428,15 +1460,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpiderLeg
   spiderRoot: {fileID: 5400181334980685304}
-  footTarget: {fileID: 6741160639998273440}
-  localOffset: {x: 0, y: 0, z: 0}
-  stepDistance: 0.5
+  footTarget: {fileID: 0}
+  localOffset: {x: -1, y: 0, z: 1}
+  stepDistance: 1
   stepHeight: 0.25
   stepDuration: 0.15
-  raycastHeight: 1.5
+  raycastHeight: 4
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
 --- !u!1 &4679152354848920519
 GameObject:
   m_ObjectHideFlags: 0
@@ -1812,7 +1844,7 @@ MonoBehaviour:
     m_Root: {fileID: 3353808256123644916}
     m_Mid: {fileID: 8192525501640796980}
     m_Tip: {fileID: 1688736473015618923}
-    m_Target: {fileID: 4521572706906975906}
+    m_Target: {fileID: 0}
     m_Hint: {fileID: 0}
     m_TargetPositionWeight: 1
     m_TargetRotationWeight: 1
@@ -2329,8 +2361,8 @@ Transform:
   m_GameObject: {fileID: 6702082474298844397}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: -0.5}
-  m_LocalScale: {x: 0.10000001, y: 0.1, z: 0.9}
+  m_LocalPosition: {x: 0, y: -0, z: -0.58}
+  m_LocalScale: {x: 0.10000001, y: 0.1, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3768516289080810373}
@@ -2496,7 +2528,7 @@ MonoBehaviour:
     m_Root: {fileID: 256575320212351034}
     m_Mid: {fileID: 3768516289080810373}
     m_Tip: {fileID: 2216987042948342344}
-    m_Target: {fileID: 6741160639998273440}
+    m_Target: {fileID: 0}
     m_Hint: {fileID: 0}
     m_TargetPositionWeight: 1
     m_TargetRotationWeight: 1
@@ -2514,7 +2546,7 @@ GameObject:
   - component: {fileID: 7031189947109977761}
   - component: {fileID: 7900882806982822551}
   m_Layer: 0
-  m_Name: FootTarget_BR
+  m_Name: Foot_BR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2529,9 +2561,9 @@ Transform:
   m_GameObject: {fileID: 7153751819754475778}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.8172855, y: -1.3478298, z: -2.9527392}
-  m_LocalScale: {x: 2.62, y: 2.62, z: 2.62}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 3, y: -1.275, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6167185169012907997}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2548,15 +2580,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpiderLeg
   spiderRoot: {fileID: 5400181334980685304}
-  footTarget: {fileID: 7031189947109977761}
-  localOffset: {x: 0, y: 0, z: 0}
-  stepDistance: 0.5
+  footTarget: {fileID: 0}
+  localOffset: {x: 1, y: 0, z: -1}
+  stepDistance: 1
   stepHeight: 0.25
   stepDuration: 0.15
-  raycastHeight: 1.5
+  raycastHeight: 4
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
 --- !u!1 &7186615929586674213
 GameObject:
   m_ObjectHideFlags: 0
@@ -2581,13 +2613,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7186615929586674213}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.258819, y: 0, z: 0, w: 0.9659259}
-  m_LocalPosition: {x: 0, y: -0.0059, z: -0.9488}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.05, z: -1.182}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8836011766806700976}
-  m_LocalEulerAnglesHint: {x: -30, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7461970701041066007
 GameObject:
   m_ObjectHideFlags: 0
@@ -2823,7 +2855,7 @@ GameObject:
   - component: {fileID: 6452997730073901828}
   - component: {fileID: 3884505799315805971}
   m_Layer: 0
-  m_Name: FootTarget_FR
+  m_Name: Foot_FR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2838,8 +2870,8 @@ Transform:
   m_GameObject: {fileID: 8470577424977329058}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.8172855, y: -1.3129838, z: 2.7509995}
-  m_LocalScale: {x: 2.62, y: 2.62, z: 2.62}
+  m_LocalPosition: {x: 3, y: -1.275, z: 3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6167185169012907997}
@@ -2857,15 +2889,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpiderLeg
   spiderRoot: {fileID: 5400181334980685304}
-  footTarget: {fileID: 6452997730073901828}
-  localOffset: {x: 0, y: 0, z: 0}
-  stepDistance: 0.5
+  footTarget: {fileID: 0}
+  localOffset: {x: 1, y: 0, z: 1}
+  stepDistance: 1
   stepHeight: 0.25
   stepDuration: 0.15
-  raycastHeight: 1.5
+  raycastHeight: 4
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
 --- !u!1 &8540491302931630881
 GameObject:
   m_ObjectHideFlags: 0
@@ -2915,7 +2947,7 @@ MonoBehaviour:
     m_Root: {fileID: 8192871784901509548}
     m_Mid: {fileID: 8836011766806700976}
     m_Tip: {fileID: 153865198852310483}
-    m_Target: {fileID: 7031189947109977761}
+    m_Target: {fileID: 0}
     m_Hint: {fileID: 0}
     m_TargetPositionWeight: 1
     m_TargetRotationWeight: 1
@@ -3092,13 +3124,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9014995447970019297}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.258819, y: 0, z: 0, w: 0.9659259}
-  m_LocalPosition: {x: 0, y: -0.0059, z: -0.9488}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: -0.05, z: -1.182}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8192525501640796980}
-  m_LocalEulerAnglesHint: {x: -30, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9096872686564582816
 GameObject:
   m_ObjectHideFlags: 0
