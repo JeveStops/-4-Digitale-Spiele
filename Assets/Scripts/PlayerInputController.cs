@@ -24,6 +24,12 @@ public class PlayerInputController : MonoBehaviour
         moveScript.inputY = Input.GetAxisRaw("Vertical");
         moveScript.inputJumping = Input.GetButton("Jump");
         moveScript.inputCrouching = Input.GetKey(KeyCode.LeftControl);
+        
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            moveScript.StartDance();
+        }
+        
 
         // 2. Maus-Eingaben an den Motor senden
         moveScript.inputMouseX = Input.GetAxis("Mouse X");
@@ -39,5 +45,25 @@ public class PlayerInputController : MonoBehaviour
         {
             moveScript.StopCrouch();
         }
+        
+        // Dance
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            moveScript.StartDance();
+        }
+        bool movementInput =
+            Input.GetAxisRaw("Horizontal") != 0 ||
+            Input.GetAxisRaw("Vertical") != 0 ||
+            Input.GetButtonDown("Jump") ||
+            Input.GetKeyDown(KeyCode.LeftControl) ||
+            Input.GetKey(KeyCode.LeftShift);
+
+        if (movementInput)
+        {
+            moveScript.StopDance();
+        }
+        
+
+
     }
 }

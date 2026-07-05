@@ -13,7 +13,6 @@ public class SpiderMovement : MonoBehaviour
 
     private void Update()
     {
-        //Debug.Log("Moving: " + isMoving + " Direction: " + targetDirection);
 
         if (!isMoving)
             return;

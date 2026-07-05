@@ -6,6 +6,15 @@ public class EntityMovement : MonoBehaviour
     [Header("Assignables")]
     public Transform playerCam; // Bei Gegnern kommt hier einfach ein leeres "Kopf"-Objekt rein
     public Transform orientation;
+    
+    [Header("Dance")]
+    public Animator animator;
+    public GameObject normalCamera;
+    public GameObject danceCamera;
+    public DanceCameraOrbit danceCameraOrbit;
+    private bool isDancing;
+    public bool IsDancing => isDancing;
+
 
     private Rigidbody rb;
 
@@ -59,7 +68,10 @@ public class EntityMovement : MonoBehaviour
 
     private void Update()
     {
-        Look();
+        if (!isDancing)
+        {
+            Look();
+        }
     }
 
     // NEU: Von außen aufrufbar, wenn die Taste (oder die KI) Ducken drückt
@@ -240,4 +252,34 @@ public class EntityMovement : MonoBehaviour
     {
         grounded = false;
     }
+
+    public void StartDance()
+    {
+        if (isDancing) return;
+
+        isDancing = true;
+
+        animator.SetBool("Dance", true);
+
+        if (normalCamera != null) normalCamera.SetActive(false);
+        if (danceCamera != null) danceCamera.SetActive(true);
+
+        if (danceCameraOrbit != null)
+        {
+            danceCameraOrbit.StartOrbitFromCurrentView(normalCamera.transform);
+        }
+    }
+
+    public void StopDance()
+    {
+        if (!isDancing) return;
+
+        isDancing = false;
+
+        animator.SetBool("Dance", false);
+
+        if (danceCamera != null) danceCamera.SetActive(false);
+        if (normalCamera != null) normalCamera.SetActive(true);
+    }
+
 }

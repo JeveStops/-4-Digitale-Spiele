@@ -8,7 +8,6 @@ public class SpiderBrain : MonoBehaviour
         Patrol,
         Follow,
         Freeze,
-        Wave
     }
 
     [Header("References")]
@@ -17,6 +16,7 @@ public class SpiderBrain : MonoBehaviour
     [SerializeField] private SpiderBodySurfaceAligner bodyAligner;
     [SerializeField] private Animator animator;
     [SerializeField] private Transform player;
+    [SerializeField] private EntityMovement playerMovement;
 
     [Header("Patrol")]
     [SerializeField] private float minWalkTime = 2f;
@@ -50,21 +50,20 @@ public class SpiderBrain : MonoBehaviour
         bool seesPlayer = CanSeePlayer();
         float distanceToPlayer = player == null ? Mathf.Infinity : Vector3.Distance(transform.position, player.position);
 
-        if (currentState != SpiderState.Wave)
+        
+        if (seesPlayer && distanceToPlayer <= freezeDistance)
         {
-            if (seesPlayer && distanceToPlayer <= freezeDistance)
-            {
-                SetState(SpiderState.Freeze);
-            }
-            else if (seesPlayer)
-            {
-                SetState(SpiderState.Follow);
-            }
-            else
-            {
-                SetState(SpiderState.Patrol);
-            }
+            SetState(SpiderState.Freeze);
         }
+        else if (seesPlayer)
+        {
+            SetState(SpiderState.Follow);
+        }
+        else
+        {
+            SetState(SpiderState.Patrol);
+        }
+        
 
         switch (currentState)
         {
@@ -77,19 +76,9 @@ public class SpiderBrain : MonoBehaviour
                 transform.position = frozenPosition;
                 transform.rotation = frozenRotation;
                 break;
-
-            case SpiderState.Wave:
-                movement.Stop();
-                transform.position = frozenPosition;
-                transform.rotation = frozenRotation;
-
-                if (!seesPlayer)
-                {
-                    SetState(SpiderState.Patrol);
-                }
-
-                break;
         }
+
+        HandleSpiderDance();
     }
 
     private void SetState(SpiderState newState)
@@ -124,18 +113,11 @@ public class SpiderBrain : MonoBehaviour
                 FreezePose();
                 EnableProceduralAnimation(false);
 
-                if (animator != null)
-                    animator.SetBool("Freeze", true);
-                break;
-
-            case SpiderState.Wave:
-                Debug.Log("Wave!");
-                StopPatrolRoutine();
-                FreezePose();
-                EnableProceduralAnimation(false);
-
-                if (animator != null)
-                    animator.SetTrigger("Wave");
+                if (animator != null) 
+                {
+                animator.SetBool("Freeze", true);
+                animator.SetBool("Waving", true);
+                }
                 break;
         }
     }
@@ -150,7 +132,11 @@ public class SpiderBrain : MonoBehaviour
 
             case SpiderState.Freeze:
                 if (animator != null)
+                {
                     animator.SetBool("Freeze", false);
+                    animator.SetBool("Waving", false);
+                    animator.SetBool("Dancing", false);
+                }
                 break;
         }
     }
@@ -231,11 +217,23 @@ public class SpiderBrain : MonoBehaviour
         }
     }
 
-    public void StartWave()
+    public void StopWaving()
     {
-        if (currentState == SpiderState.Freeze)
-        {
-            SetState(SpiderState.Wave);
-        }
+        animator.SetBool("Waving", false);
     }
+
+    private void HandleSpiderDance()
+    {
+        if (animator == null || playerMovement == null)
+            return;
+
+        bool isFrozen = currentState == SpiderState.Freeze;
+        bool isWaving = animator.GetBool("Waving");
+        bool playerIsDancing = playerMovement.IsDancing;
+
+        bool spiderShouldDance = isFrozen && !isWaving && playerIsDancing;
+
+        animator.SetBool("Dancing", spiderShouldDance);
+    }
+
 }
