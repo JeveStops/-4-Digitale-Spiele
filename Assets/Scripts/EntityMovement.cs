@@ -59,6 +59,12 @@ public class EntityMovement : MonoBehaviour
     void Start()
     {
         playerScale = transform.localScale;
+
+            if (normalCamera != null)
+        normalCamera.SetActive(true);
+
+        if (danceCamera != null)
+            danceCamera.SetActive(false);
     }
 
     private void FixedUpdate()
